@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.yjf.dao.CourseDao">
+    <select id="getCourseByStuId" parameterType="Integer" resultType="Course">
+        select * from course where stu_id=#{stuId}
+    </select>
+</mapper>

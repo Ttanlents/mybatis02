@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.yjf.dao.StudentDao">
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="stuId" keyColumn="stu_id">
+        insert into student values
+        <foreach collection="list" item="stu" separator=",">
+            (null,#{stu.stuName},#{stu.stuAge},#{stu.stuPassword})
+        </foreach>
+    </insert>
+
+    <delete id="delete">
+        delete from student where stu_id in
+        <foreach collection="list" item="index" open="(" close=")" separator=",">
+            #{index}
+        </foreach>
+    </delete>
+
+    <update id="update" parameterType="Student">
+        update student
+        <set>
+            <if test="stuName!=null">
+                stu_name=#{stuName},
+            </if>
+            <if test="stuAge1=null">
+                stu_age=#{stuAge},
+            </if>
+            <if test="stuPassword!=null">
+                stu_password=#{stuPassword},
+            </if>
+        </set>
+        where stu_id=#{stuId}
+    </update>
+
+    <sql id="baseSql">
+        stu_id,
+        stu_name,
+        stu_age,
+        stu_password
+    </sql>
+
+<!--此处不允许加逗号-->
+    <sql id="baseSql2">
+        stu_id,
+        stu_name
+    </sql>
+
+    <sql id="baseSql3">
+        stu_age,
+        stu_password
+    </sql>
+
+
+    <cache></cache>
+    <select id="selectByNameAndAge" resultType="Student" useCache="true">
+        select
+        <include refid="baseSql"/>
+        from student
+        <where>
+            <if test="name!=null">
+               and stu_name like concat('%',#{name},'%')
+            </if>
+            <if test="start!=null">
+                and stu_age&gt;=#{start}
+            </if>
+            <if test="end!=null">
+                and stu_age&lt;=#{end}
+            </if>
+        </where>
+    </select>
+
+
+    <resultMap id="StudentMap" type="Student" autoMapping="true">
+        <id property="stuId" column="stu_id" />
+        <association property="address"  column="address_id" select="com.yjf.dao.AddressDao.getAddressById" javaType="Address"/>
+        <collection property="courses" column="stu_id"  ofType="Course" select="com.yjf.dao.CourseDao.getCourseByStuId" />
+    </resultMap>
+
+    <select id="listAll" resultMap="StudentMap">
+        select * from student
+    </select>
+</mapper>
